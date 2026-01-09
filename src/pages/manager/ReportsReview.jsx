@@ -36,7 +36,7 @@ export default function ReportsReview() {
 
   const fetchAllReports=async()=>{
     try{  
-      const res=await axios.get('http://localhost:5000/report/all');
+      const res=await axios.get('https://safety-management-system-backend.onrender.com/report/all');
             console.log(res.data.data)
       setReports(res.data.data);
       setViewLabel("Showing all reports");
@@ -51,7 +51,7 @@ export default function ReportsReview() {
       return;
     }
     try{
-      const res=await axios.get(`http://localhost:5000/report/search?title=${searchTitle}`);
+      const res=await axios.get(`https://safety-management-system-backend.onrender.com/report/search?title=${searchTitle}`);
       setReports(res.data.data);
       setViewLabel(`Showing results for search: "${searchTitle}"`);
     }catch(err){
@@ -67,7 +67,7 @@ export default function ReportsReview() {
       return;
     }
     try{
-      const res=await axios.get(`http://localhost:5000/report/filter/status/${value}`);
+      const res=await axios.get(`https://safety-management-system-backend.onrender.com/report/filter/status/${value}`);
       setReports(res.data.data);
       setViewLabel(`Showing results filtered by Status: ${value}`);
     }catch(err){
@@ -83,7 +83,7 @@ export default function ReportsReview() {
       return;
     }
     try{
-      const res=await axios.get(`http://localhost:5000/report/filter/priority/${value}`);
+      const res=await axios.get(`https://safety-management-system-backend.onrender.com/report/filter/priority/${value}`);
       setReports(res.data.data);
        setViewLabel(`Showing results filtered by Priority: ${value}`);
     }catch(err){
@@ -95,7 +95,7 @@ export default function ReportsReview() {
 
   const handleAction = async (id, status) => {
   try {
-    await axios.patch(`http://localhost:5000/report/status/${id}`,{ status:status });
+    await axios.patch(`https://safety-management-system-backend.onrender.com/report/status/${id}`,{ status:status });
       setReports((prevReports) =>
       prevReports.map((report) =>
         report._id === id ? { ...report, status: status } : report

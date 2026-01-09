@@ -20,8 +20,8 @@ export default function Login() {
     e.preventDefault();
     try{
       console.log({email,password});
-      const res=await axios.post('http://localhost:5000/auth/login',{email,password});
-      console.log(res);
+      const res=await axios.post('https://safety-management-system-backend.onrender.com/auth/login',{email,password},{withCredentials:true});
+      //console.log(res);
        const role = res.data.user.role;
       toast.success('Login Successfully');
       if (role === "admin") navigate("/admin");

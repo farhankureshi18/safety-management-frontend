@@ -68,7 +68,7 @@ export default function CorrectiveActions() {
   const fetchActions = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/action/getAllAction");
+      const res = await axios.get("https://safety-management-system-backend.onrender.com/action/getAllAction");
       setActions(res.data.data);
     } catch (error) {
       console.error("Error fetching actions", error);
@@ -81,7 +81,7 @@ export default function CorrectiveActions() {
   const fetchEmployees = async () => {
     try {
       setLoadingEmp(true);
-      const res = await axios.get("http://localhost:5000/hazard/getAllEmp");
+      const res = await axios.get("https://safety-management-system-backend.onrender.com/hazard/getAllEmp");
       setEmployees(res.data.data);
     } catch (error) {
       console.error("Error fetching employees", error);
@@ -93,7 +93,7 @@ export default function CorrectiveActions() {
   // Delete action
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/action/delete/${id}`);
+      await axios.delete(`https://safety-management-system-backend.onrender.com/action/delete/${id}`);
       setActions((prev) => prev.filter((a) => a._id !== id));
     } catch (error) {
       console.error("Delete failed", error);
@@ -114,7 +114,7 @@ export default function CorrectiveActions() {
         fetchActions();
         return;
       }
-      const res = await axios.get(`http://localhost:5000/action/search?title=${value}`);
+      const res = await axios.get(`https://safety-management-system-backend.onrender.com/action/search?title=${value}`);
       setActions(res.data.data);
     } catch (err) {
       console.error("Error searching actions", err);
@@ -128,21 +128,21 @@ export default function CorrectiveActions() {
 
       // Only status filter
       if (status !== "all" && assignedTo === "all") {
-        const res = await axios.get(`http://localhost:5000/action/filter/status?status=${status}`);
+        const res = await axios.get(`https://safety-management-system-backend.onrender.com/action/filter/status?status=${status}`);
         setActions(res.data.data);
         return;
       }
 
       // Only employee filter
       if (status === "all" && assignedTo !== "all") {
-        const res = await axios.get(`http://localhost:5000/action/filter/assigned?assignedTo=${assignedTo}`);
+        const res = await axios.get(`https://safety-management-system-backend.onrender.comaction/filter/assigned?assignedTo=${assignedTo}`);
         setActions(res.data.data);
         return;
       }
 
       // Both filters
       if (status !== "all" && assignedTo !== "all") {
-        const res = await axios.get(`http://localhost:5000/action/filter/status?status=${status}`);
+        const res = await axios.get(`https://safety-management-system-backend.onrender.com/action/filter/status?status=${status}`);
         const filtered = res.data.data.filter((a) => a.assignedTo?._id === assignedTo);
         setActions(filtered);
         return;

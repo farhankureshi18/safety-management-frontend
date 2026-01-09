@@ -47,7 +47,7 @@ const handleSubmit = async (e) => {
     if (user?._id) {
       //EDIT USER
       await axios.put(
-        `http://localhost:5000/auth/edit/${user._id}`,
+        `https://safety-management-system-backend.onrender.com/auth/edit/${user._id}`,
         formData,
         { withCredentials: true }
       );
@@ -55,7 +55,7 @@ const handleSubmit = async (e) => {
     } else {
       // CREATE USER
       await axios.post(
-        "http://localhost:5000/auth/register",
+        "https://safety-management-system-backend.onrender.com/auth/register",
         formData,
         { withCredentials: true }
       );

@@ -28,7 +28,7 @@ export default function AdminDashboard() {
 
    const fetchAllReports=async()=>{
     try{  
-      const res=await axios.get('http://localhost:5000/report/all');
+      const res=await axios.get('https://safety-management-system-backend.onrender.com/report/all');
       console.log(res.data.data)
       setReports(res.data.data);
     }catch(err){
@@ -38,7 +38,7 @@ export default function AdminDashboard() {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/auth/users',{ withCredentials: true });
+      const res = await axios.get('https://safety-management-system-backend.onrender.com/auth/users',{ withCredentials: true });
       //console.log(res.data.totalUsers)
       setUsers(res.data.totalUsers);
     } catch (err) {
@@ -48,7 +48,7 @@ export default function AdminDashboard() {
 
   const fetchReports=async()=>{
      try {
-      const res = await axios.get('http://localhost:5000/report/all',{ withCredentials: true });
+      const res = await axios.get('https://safety-management-system-backend.onrender.com/report/all',{ withCredentials: true });
       //console.log(res.data.totalUsers)
        setReportCount(res.data.count);
     } catch (err) {
@@ -58,7 +58,7 @@ export default function AdminDashboard() {
 
   const fetchHazard=async()=>{
      try {
-      const res = await axios.get('http://localhost:5000/hazard/get',{ withCredentials: true });
+      const res = await axios.get('https://safety-management-system-backend.onrender.com/hazard/get',{ withCredentials: true });
       const hazard=res.data.data || [];
       const activeCount=hazard.filter((h)=> h.status?.toLowerCase() === 'open').length;
       setHazardCount(activeCount);
@@ -70,7 +70,7 @@ export default function AdminDashboard() {
   const fetchRecentActivity=async()=>{
     try{
       setLoading(true);
-      const res=await axios.get('http://localhost:5000/activity/recent',{withCredentials:true});
+      const res=await axios.get('https://safety-management-system-backend.onrender.com/activity/recent',{withCredentials:true});
       //console.log(res.data)
       if (res.data.success) {
           setActivities(res.data.data); 

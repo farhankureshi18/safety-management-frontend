@@ -31,7 +31,7 @@ export default function UserManagement() {
   const fetchUsers = async (pageNo = 1) => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/auth/users?page=${pageNo}`,
+        `https://safety-management-system-backend.onrender.com/auth/users?page=${pageNo}`,
         { withCredentials: true }
       );
       setUsers(res.data.users);
@@ -131,7 +131,7 @@ export default function UserManagement() {
             try {
               console.log(user._id)
               await axios.delete(
-                `http://localhost:5000/auth/delete/${user._id}`,
+                `https://safety-management-system-backend.onrender.com/auth/delete/${user._id}`,
                 { withCredentials: true }
               );
               toast.success("User deleted");
@@ -190,7 +190,7 @@ export default function UserManagement() {
                 }
                 try {
                   const res = await axios.get(
-                    `http://localhost:5000/auth/userById?name=${value}`,
+                    `https://safety-management-system-backend.onrender.com/auth/userById?name=${value}`,
                     { withCredentials: true }
                   );
                   setUsers(res.data.users);

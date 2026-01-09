@@ -35,7 +35,7 @@ const [loadingEmp, setLoadingEmp] = useState(false);
   const fetchEmployees = async () => {  
   try {
     setLoadingEmp(true);
-    const res = await axios.get("http://localhost:5000/hazard/getAllEmp");
+    const res = await axios.get("https://safety-management-system-backend.onrender.com/hazard/getAllEmp");
     console.log(res)
     setEmployees(res.data.data);
   } catch (error) {
@@ -49,10 +49,10 @@ const [loadingEmp, setLoadingEmp] = useState(false);
   e.preventDefault();
   try {
     if (hazard?._id) {
-      await axios.put(`http://localhost:5000/hazard/update/${hazard._id}`,formData );
+      await axios.put(`https://safety-management-system-backend.onrender.comhazard/update/${hazard._id}`,formData );
         toast.success("Hazard updated successfully");
     } else {
-      await axios.post("http://localhost:5000/hazard/create",formData, { withCredentials: true });
+      await axios.post("https://safety-management-system-backend.onrender.com/hazard/create",formData, { withCredentials: true });
       toast.success("Hazard created successfully");
     }
     onClose();

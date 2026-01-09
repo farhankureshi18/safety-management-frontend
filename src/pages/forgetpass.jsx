@@ -1,4 +1,3 @@
-// src/pages/ForgetPass.jsx
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
@@ -10,14 +9,14 @@ import { toast } from "sonner";
 export default function ForgetPass() {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
-  const [step, setStep] = useState(1); // 1=email, 2=otp, 3=password
+  const [step, setStep] = useState(1);
   const [newPass, setNewPass] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
   const navigate = useNavigate();
 
   const sendOtp = async () => {
     try {
-      const res = await axios.post("http://localhost:5000/auth/send-otp", { email });
+      const res = await axios.post("https://safety-management-system-backend.onrender.com/auth/send-otp", { email });
       toast.success(res.data.message);
       setStep(2);
     } catch (err) {
@@ -27,7 +26,7 @@ export default function ForgetPass() {
 
   const verifyOtp = async () => {
     try {
-      const res = await axios.post("http://localhost:5000/auth/verify-otp", { email, otp });
+      const res = await axios.post("https://safety-management-system-backend.onrender.com/auth/verify-otp", { email, otp });
       toast.success(res.data.message);
       setStep(3);
     } catch (err) {
@@ -38,7 +37,7 @@ export default function ForgetPass() {
   const updatePassword = async () => {
     if (newPass !== confirmPass) return toast.error("Passwords do not match");
     try {
-      const res = await axios.post("http://localhost:5000/auth/update-password", {
+      const res = await axios.post("https://safety-management-system-backend.onrender.com/auth/update-password", {
         email,
         password: newPass,
       });

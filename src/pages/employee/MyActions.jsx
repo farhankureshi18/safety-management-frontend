@@ -18,7 +18,7 @@ export default function MyActions() {
   const fetchMyActions = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5000/action/get",
+        "https://safety-management-system-backend.onrender.com/action/get ",
         {
           withCredentials: true, //to sent cookie from browser
         }
@@ -33,7 +33,7 @@ export default function MyActions() {
   const updateStatus=async(id,status)=>{
     try{
       setLoadingId((prev)=>[...prev,id]);
-      await axios.patch(`http://localhost:5000/action/updstatus/${id}`,{status},{withCredentials:true});
+      await axios.patch(`https://safety-management-system-backend.onrender.com/action/updstatus/${id}`,{status},{withCredentials:true});
       setActions((prev) =>
       prev.map((action) =>
         action._id === id ? { ...action, status } : action

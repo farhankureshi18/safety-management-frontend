@@ -23,8 +23,8 @@ export default function EmployeeDashboard() {
   const fetchDashBoardData=async()=>{
     try{
       setLoading(true);
-      const reportRes=await axios.get('http://localhost:5000/report/getById/me');
-      const actionRes=await axios.get('http://localhost:5000/action/getById/me');
+      const reportRes=await axios.get('https://safety-management-system-backend.onrender.com/report/getById/me');
+      const actionRes=await axios.get('https://safety-management-system-backend.onrender.com/action/getById/me');
       setReports(reportRes.data || [])
       setActions(actionRes.data || [])
     }catch(err){

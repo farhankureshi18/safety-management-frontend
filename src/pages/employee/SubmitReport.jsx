@@ -56,10 +56,10 @@ export default function SubmitReport() {
       data.append("description", formData.description);
 
       if (attachment) {
-        data.append("attachment", attachment);
+        data.append("attachment", attachment);  
       }
       console.log(data);
-      await axios.post("http://localhost:5000/report/create",data,
+      await axios.post("https://safety-management-system-backend.onrender.com/report/create",data,
         {
           headers: {
             "Content-Type": "multipart/form-data"

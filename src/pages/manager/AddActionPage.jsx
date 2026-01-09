@@ -43,7 +43,7 @@ const AddActionModal = ({ onClose }) => {
         ...formData,
         dueDate: new Date(formData.dueDate),
       };
-      const res = await axios.post("http://localhost:5000/action/create",payload);
+      const res = await axios.post("https://safety-management-system-backend.onrender.com/action/create",payload);
       toast.success("Action created successfully");
       onClose();
     } catch (err) {
@@ -55,7 +55,7 @@ const AddActionModal = ({ onClose }) => {
 const fetchEmployees = async () => {  
   try {
     setLoadingEmp(true);
-    const res = await axios.get("http://localhost:5000/hazard/getAllEmp");
+    const res = await axios.get("https://safety-management-system-backend.onrender.com/hazard/getAllEmp");
     console.log(res)
     setEmployees(res.data.data);
   } catch (error) {
@@ -68,7 +68,7 @@ const fetchEmployees = async () => {
  const fetchHazards = async () => {
   try {
     setLoadingHazards(true);
-    const res = await axios.get("http://localhost:5000/hazard/get");
+    const res = await axios.get("https://safety-management-system-backend.onrender.com/hazard/get");
     setHazards(res.data.data); 
   } catch (error) {
     console.error("Error fetching hazards", error);

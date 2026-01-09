@@ -45,7 +45,7 @@ export function ManagerLayout({ children }) {
           <Button onClick={async () => {
               try {
                 await axios.post(
-                  "http://localhost:5000/auth/logout",
+                  "https://safety-management-system-backend.onrender.com/auth/logout",
                   {},
                   { withCredentials: true }
                 );
@@ -70,7 +70,7 @@ export function ManagerLayout({ children }) {
 
  const fetchUser = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/auth/me", {
+      const res = await axios.get("https://safety-management-system-backend.onrender.com/auth/me", {
         withCredentials: true
       });
       setUser(res.data.user);

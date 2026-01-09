@@ -26,7 +26,7 @@ import { KPICard } from "@/components/shared/KPICard";
 
     const fetchHazards=async()=>{
       try{
-        const res=await axios.get('http://localhost:5000/hazard/get');
+        const res=await axios.get('https://safety-management-system-backend.onrender.com/hazard/get');
         setGetHazards(res.data.data); 
         console.log(res.data.data,'aaa')
       }catch(err){
@@ -40,7 +40,7 @@ import { KPICard } from "@/components/shared/KPICard";
       }
       try{
         setSearchLoading(true);
-        const res=await axios.get(`http://localhost:5000/hazard/search?title=${query}`);
+        const res=await axios.get(`https://safety-management-system-backend.onrender.com/hazard/search?title=${query}`);
         setGetHazards(res.data.data);
       }catch(err){
         console.error("Search hazard error", err);

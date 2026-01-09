@@ -35,7 +35,7 @@ export default function ManagerDashboard() {
 //Pending reports
   const fetchPendingReports = async () => {
   try {
-    const res = await axios.get('http://localhost:5000/report/all', { withCredentials: true });
+    const res = await axios.get('https://safety-management-system-backend.onrender.com/report/all', { withCredentials: true });
     const reportsArray = res.data.data || []; //access array inside object
     const pending = reportsArray.filter(
       (r) => r.status && r.status.toLowerCase().includes("pending")
@@ -57,7 +57,7 @@ export default function ManagerDashboard() {
 //Open Hazard
   const fetchOpenHazards = async () => {
   try {
-    const res = await axios.get('http://localhost:5000/hazard/get', { withCredentials: true });
+    const res = await axios.get('https://safety-management-system-backend.onrender.com/hazard/get', { withCredentials: true });
     const hazardsArray = res.data.data || []; // access array inside object
     const open = hazardsArray.filter((h) => h.status === 'Open' || h.status === 'open');
     const mapped = open.slice(0, 4).map((h) => ({
@@ -76,7 +76,7 @@ export default function ManagerDashboard() {
 //Delayed Actions
 const fetchActions=async()=>{
   try{
-    const res = await axios.get("http://localhost:5000/action/getOutdatedAction",{ withCredentials: true });
+    const res = await axios.get("https://safety-management-system-backend.onrender.com/action/getOutdatedAction",{ withCredentials: true });
     setOverdueActions(res.data.data);
   }catch(err){
     console.error(err);
@@ -86,7 +86,7 @@ const fetchActions=async()=>{
 //resolve this week
 // const resolveActionInWeek=async()=>{
 //   try{
-//     const res = await axios.get("http://localhost:5000/actions", { withCredentials: true });
+//     const res = await axios.get("https://safety-management-system-backend.onrender.com/actions", { withCredentials: true });
 //     const actionsData = res.data.data || [];
 //     setActions(actionsData);
 //     const count = calculateResolvedThisWeek(actionsData);
