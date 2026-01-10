@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import Register from "./Register";
 import axios from "axios"
 import { toast } from "sonner";
+import api from "../../api/axiosInstance";
 
 
 export default function UserManagement() {
@@ -30,8 +31,8 @@ export default function UserManagement() {
 
   const fetchUsers = async (pageNo = 1) => {
     try {
-      const res = await axios.get(
-        `https://safety-management-system-backend.onrender.com/auth/users?page=${pageNo}`,
+      const res = await api.get(
+        `/auth/users?page=${pageNo}`,
         { withCredentials: true }
       );
       setUsers(res.data.users);
@@ -130,8 +131,8 @@ export default function UserManagement() {
           onClick={async () => {
             try {
               console.log(user._id)
-              await axios.delete(
-                `https://safety-management-system-backend.onrender.com/auth/delete/${user._id}`,
+              await api.delete(
+                `/auth/delete/${user._id}`,
                 { withCredentials: true }
               );
               toast.success("User deleted");
@@ -189,8 +190,8 @@ export default function UserManagement() {
                   return;
                 }
                 try {
-                  const res = await axios.get(
-                    `https://safety-management-system-backend.onrender.com/auth/userById?name=${value}`,
+                  const res = await api.get(
+                    `/auth/userById?name=${value}`,
                     { withCredentials: true }
                   );
                   setUsers(res.data.users);

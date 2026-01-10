@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import axios from "axios";
+import api from "../../api/axiosInstance";
 import {toast} from "@/components/ui/sonner"
 
 
@@ -43,7 +44,7 @@ const AddActionModal = ({ onClose }) => {
         ...formData,
         dueDate: new Date(formData.dueDate),
       };
-      const res = await axios.post("https://safety-management-system-backend.onrender.com/action/create",payload);
+      const res = await api.post("/action/create",payload);
       toast.success("Action created successfully");
       onClose();
     } catch (err) {
@@ -55,7 +56,7 @@ const AddActionModal = ({ onClose }) => {
 const fetchEmployees = async () => {  
   try {
     setLoadingEmp(true);
-    const res = await axios.get("https://safety-management-system-backend.onrender.com/hazard/getAllEmp");
+    const res = await api.get("/hazard/getAllEmp");
     console.log(res)
     setEmployees(res.data.data);
   } catch (error) {
@@ -68,7 +69,7 @@ const fetchEmployees = async () => {
  const fetchHazards = async () => {
   try {
     setLoadingHazards(true);
-    const res = await axios.get("https://safety-management-system-backend.onrender.com/hazard/get");
+    const res = await api.get("/hazard/get");
     setHazards(res.data.data); 
   } catch (error) {
     console.error("Error fetching hazards", error);

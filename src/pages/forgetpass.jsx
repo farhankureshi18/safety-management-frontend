@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import api from "../api/axiosInstance";
+
 
 export default function ForgetPass() {
   const [email, setEmail] = useState("");
@@ -16,7 +18,7 @@ export default function ForgetPass() {
 
   const sendOtp = async () => {
     try {
-      const res = await axios.post("https://safety-management-system-backend.onrender.com/auth/send-otp", { email });
+      const res = await api.post("/auth/send-otp", { email });
       toast.success(res.data.message);
       setStep(2);
     } catch (err) {
@@ -26,7 +28,7 @@ export default function ForgetPass() {
 
   const verifyOtp = async () => {
     try {
-      const res = await axios.post("https://safety-management-system-backend.onrender.com/auth/verify-otp", { email, otp });
+      const res = await api.post("/auth/verify-otp", { email, otp });
       toast.success(res.data.message);
       setStep(3);
     } catch (err) {
@@ -37,7 +39,7 @@ export default function ForgetPass() {
   const updatePassword = async () => {
     if (newPass !== confirmPass) return toast.error("Passwords do not match");
     try {
-      const res = await axios.post("https://safety-management-system-backend.onrender.com/auth/update-password", {
+      const res = await api.post("/auth/update-password", {
         email,
         password: newPass,
       });

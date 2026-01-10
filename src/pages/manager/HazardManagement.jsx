@@ -9,6 +9,8 @@
   import { Search, MapPin, Calendar, User, Plus, Edit } from "lucide-react";
   import { useState,useEffect } from "react";
   import axios from "axios";
+  import api from "../../api/axiosInstance";
+
 
 
 
@@ -30,7 +32,7 @@
 
     const fetchHazards=async()=>{
       try{
-        const res=await axios.get('https://safety-management-system-backend.onrender.com/hazard/get');
+        const res=await api.get('/hazard/get');
         setGetHazards(res.data.data); 
         console.log(res,'aaa')
       }catch(err){
@@ -40,7 +42,7 @@
 
     const updateStatus=async(id,status)=>{
       try{
-        const res=await axios.patch(`https://safety-management-system-backend.onrender.com/hazard/updStatus/${id}`,{status});
+        const res=await api.patch(`/hazard/updStatus/${id}`,{status});
         fetchHazards();
       }catch(err){
         console.log('Status Update Failed',err);
@@ -53,7 +55,7 @@
       }
       try{
         setSearchLoading(true);
-        const res=await axios.get(`https://safety-management-system-backend.onrender.com/hazard/search?title=${query}`);
+        const res=await api.get(`/hazard/search?title=${query}`);
         setGetHazards(res.data.data);
       }catch(err){
         console.error("Search hazard error", err);
@@ -70,7 +72,7 @@
 
     //   try {
     //     const res = await axios.get(
-    //       `https://safety-management-system-backend.onrender.com/hazard/filter/status?status=${status}`
+    //       `/hazard/filter/status?status=${status}`
     //     );
     //     setGetHazards(res.data.data);
     //   } catch (err) {
@@ -84,7 +86,7 @@
     //     return;
     //   }
     //   try {
-    //     const res = await axios.get(`https://safety-management-system-backend.onrender.com/hazard/filter/risk?level=${level}`);
+    //     const res = await axios.get(`/hazard/filter/risk?level=${level}`);
     //     setGetHazards(res.data.data);
     //   } catch (err) {
     //     console.error("Risk filter error", err);

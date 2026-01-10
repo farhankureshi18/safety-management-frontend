@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import axios from "axios";
+import api from '../api/axiosInstance'
 
 
 export default function Login() {
@@ -20,7 +21,7 @@ export default function Login() {
     e.preventDefault();
     try{
       console.log({email,password});
-      const res=await axios.post('https://safety-management-system-backend.onrender.com/auth/login',{email,password},{withCredentials:true});
+      const res=await api.post("/auth/login",{email,password},{withCredentials:true});
       //console.log(res);
        const role = res.data.user.role;
       toast.success('Login Successfully');

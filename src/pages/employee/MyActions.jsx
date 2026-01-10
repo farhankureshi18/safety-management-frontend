@@ -6,6 +6,8 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Calendar,Loader } from "lucide-react";
+import api from "../../api/axiosInstance";
+
 
 export default function MyActions() {
   const [actions, setActions] = useState([]);
@@ -17,8 +19,8 @@ export default function MyActions() {
 
   const fetchMyActions = async () => {
     try {
-      const res = await axios.get(
-        "https://safety-management-system-backend.onrender.com/action/get ",
+      const res = await api.get(
+        "/action/get ",
         {
           withCredentials: true, //to sent cookie from browser
         }
@@ -33,7 +35,7 @@ export default function MyActions() {
   const updateStatus=async(id,status)=>{
     try{
       setLoadingId((prev)=>[...prev,id]);
-      await axios.patch(`https://safety-management-system-backend.onrender.com/action/updstatus/${id}`,{status},{withCredentials:true});
+      await api.patch(`/action/updstatus/${id}`,{status},{withCredentials:true});
       setActions((prev) =>
       prev.map((action) =>
         action._id === id ? { ...action, status } : action

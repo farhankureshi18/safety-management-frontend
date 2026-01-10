@@ -14,6 +14,7 @@ import {
 import {toast} from "@/components/ui/sonner"
 import { Upload, Send } from "lucide-react";
 import { useState } from "react";
+import api from "../../api/axiosInstance";
 import axios from "axios";
 
 export default function SubmitReport() {
@@ -59,7 +60,7 @@ export default function SubmitReport() {
         data.append("attachment", attachment);  
       }
       console.log(data);
-      await axios.post("https://safety-management-system-backend.onrender.com/report/create",data,
+      await api.post("/report/create",data,
         {
           headers: {
             "Content-Type": "multipart/form-data"

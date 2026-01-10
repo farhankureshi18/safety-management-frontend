@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
+import api from "../../api/axiosInstance";
+
 import {toast} from "@/components/ui/sonner"
 
 
@@ -35,7 +37,7 @@ const [loadingEmp, setLoadingEmp] = useState(false);
   const fetchEmployees = async () => {  
   try {
     setLoadingEmp(true);
-    const res = await axios.get("https://safety-management-system-backend.onrender.com/hazard/getAllEmp");
+    const res = await api.get("/hazard/getAllEmp");
     console.log(res)
     setEmployees(res.data.data);
   } catch (error) {
@@ -49,10 +51,10 @@ const [loadingEmp, setLoadingEmp] = useState(false);
   e.preventDefault();
   try {
     if (hazard?._id) {
-      await axios.put(`https://safety-management-system-backend.onrender.comhazard/update/${hazard._id}`,formData );
+      await api.put(`hazard/update/${hazard._id}`,formData );
         toast.success("Hazard updated successfully");
     } else {
-      await axios.post("https://safety-management-system-backend.onrender.com/hazard/create",formData, { withCredentials: true });
+      await api.post("/hazard/create",formData, { withCredentials: true });
       toast.success("Hazard created successfully");
     }
     onClose();

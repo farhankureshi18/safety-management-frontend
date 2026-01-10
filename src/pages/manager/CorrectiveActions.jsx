@@ -14,6 +14,8 @@ import { Search, Calendar, User, Plus, CheckCircle, Clock, AlertCircle } from "l
 import { useState, useEffect } from "react";
 import AddActionPage from "./AddActionPage";
 import axios from "axios";
+import api from "../../api/axiosInstance";
+
 
 const getStatusUI = (status) => {
   switch (status) {
@@ -68,7 +70,7 @@ export default function CorrectiveActions() {
   const fetchActions = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("https://safety-management-system-backend.onrender.com/action/getAllAction");
+      const res = await api.get("/action/getAllAction");
       setActions(res.data.data);
     } catch (error) {
       console.error("Error fetching actions", error);
@@ -81,7 +83,7 @@ export default function CorrectiveActions() {
   const fetchEmployees = async () => {
     try {
       setLoadingEmp(true);
-      const res = await axios.get("https://safety-management-system-backend.onrender.com/hazard/getAllEmp");
+      const res = await api.get("/hazard/getAllEmp");
       setEmployees(res.data.data);
     } catch (error) {
       console.error("Error fetching employees", error);
@@ -93,7 +95,7 @@ export default function CorrectiveActions() {
   // Delete action
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`https://safety-management-system-backend.onrender.com/action/delete/${id}`);
+      await api.delete(`/action/delete/${id}`);
       setActions((prev) => prev.filter((a) => a._id !== id));
     } catch (error) {
       console.error("Delete failed", error);
@@ -114,7 +116,7 @@ export default function CorrectiveActions() {
         fetchActions();
         return;
       }
-      const res = await axios.get(`https://safety-management-system-backend.onrender.com/action/search?title=${value}`);
+      const res = await api.get(`/action/search?title=${value}`);
       setActions(res.data.data);
     } catch (err) {
       console.error("Error searching actions", err);
@@ -128,21 +130,21 @@ export default function CorrectiveActions() {
 
       // Only status filter
       if (status !== "all" && assignedTo === "all") {
-        const res = await axios.get(`https://safety-management-system-backend.onrender.com/action/filter/status?status=${status}`);
+        const res = await api.get(`/action/filter/status?status=${status}`);
         setActions(res.data.data);
         return;
       }
 
       // Only employee filter
       if (status === "all" && assignedTo !== "all") {
-        const res = await axios.get(`https://safety-management-system-backend.onrender.comaction/filter/assigned?assignedTo=${assignedTo}`);
+        const res = await api.get(`action/filter/assigned?assignedTo=${assignedTo}`);
         setActions(res.data.data);
         return;
       }
 
       // Both filters
       if (status !== "all" && assignedTo !== "all") {
-        const res = await axios.get(`https://safety-management-system-backend.onrender.com/action/filter/status?status=${status}`);
+        const res = await api.get(`/action/filter/status?status=${status}`);
         const filtered = res.data.data.filter((a) => a.assignedTo?._id === assignedTo);
         setActions(filtered);
         return;

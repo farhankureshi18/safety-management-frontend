@@ -7,6 +7,8 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import api from "../../api/axiosInstance";
+
 
 
 
@@ -23,8 +25,8 @@ export default function EmployeeDashboard() {
   const fetchDashBoardData=async()=>{
     try{
       setLoading(true);
-      const reportRes=await axios.get('https://safety-management-system-backend.onrender.com/report/getById/me');
-      const actionRes=await axios.get('https://safety-management-system-backend.onrender.com/action/getById/me');
+      const reportRes=await api.get('/report/getById/me');
+      const actionRes=await api.get('/action/getById/me');
       setReports(reportRes.data || [])
       setActions(actionRes.data || [])
     }catch(err){

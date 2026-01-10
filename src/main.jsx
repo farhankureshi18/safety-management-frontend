@@ -8,7 +8,7 @@ if (rootElement) {
   createRoot(rootElement).render(<App />);
 }
 
-axios.defaults.baseURL = "https://safety-management-system-backend.onrender.com";
+axios.defaults.baseURL = "";
 axios.defaults.withCredentials = true; 
 
 export default axios;

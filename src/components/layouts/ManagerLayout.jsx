@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import {LayoutDashboard,FileText,AlertTriangle,CheckSquare,Bell,Menu,X,Shield,LogOut,ChevronRight,} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+import api from "../../api/axiosInstance";
 import { toast } from "sonner";
 
 
@@ -44,8 +45,8 @@ export function ManagerLayout({ children }) {
           </Button>
           <Button onClick={async () => {
               try {
-                await axios.post(
-                  "https://safety-management-system-backend.onrender.com/auth/logout",
+                await api.post(
+                  "/auth/logout",
                   {},
                   { withCredentials: true }
                 );
@@ -70,7 +71,7 @@ export function ManagerLayout({ children }) {
 
  const fetchUser = async () => {
     try {
-      const res = await axios.get("https://safety-management-system-backend.onrender.com/auth/me", {
+      const res = await api.get("/auth/me", {
         withCredentials: true
       });
       setUser(res.data.user);

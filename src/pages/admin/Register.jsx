@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/sonner";
 import axios from "axios";
+import api from "../../api/axiosInstance";
+
 
 const Register = ({ onClose,user }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -46,16 +48,16 @@ const handleSubmit = async (e) => {
   try {
     if (user?._id) {
       //EDIT USER
-      await axios.put(
-        `https://safety-management-system-backend.onrender.com/auth/edit/${user._id}`,
+      await api.put(
+        `/auth/edit/${user._id}`,
         formData,
         { withCredentials: true }
       );
       toast.success("User updated successfully");
     } else {
       // CREATE USER
-      await axios.post(
-        "https://safety-management-system-backend.onrender.com/auth/register",
+      await api.post(
+        "/auth/register",
         formData,
         { withCredentials: true }
       );

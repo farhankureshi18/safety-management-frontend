@@ -6,6 +6,7 @@ import { Users, FileText, AlertTriangle, CheckCircle, TrendingUp, Clock } from "
 import { Link } from "react-router-dom";
 import { useState,useEffect } from "react";
 import axios from "axios";
+import api from '../../api/axiosInstance'
 
 
 export default function AdminDashboard() {
@@ -28,7 +29,7 @@ export default function AdminDashboard() {
 
    const fetchAllReports=async()=>{
     try{  
-      const res=await axios.get('https://safety-management-system-backend.onrender.com/report/all');
+      const res=await api.get('/report/all');
       console.log(res.data.data)
       setReports(res.data.data);
     }catch(err){
@@ -38,7 +39,7 @@ export default function AdminDashboard() {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get('https://safety-management-system-backend.onrender.com/auth/users',{ withCredentials: true });
+      const res = await api.get('/auth/users',{ withCredentials: true });
       //console.log(res.data.totalUsers)
       setUsers(res.data.totalUsers);
     } catch (err) {
@@ -48,7 +49,7 @@ export default function AdminDashboard() {
 
   const fetchReports=async()=>{
      try {
-      const res = await axios.get('https://safety-management-system-backend.onrender.com/report/all',{ withCredentials: true });
+      const res = await api.get('/report/all',{ withCredentials: true });
       //console.log(res.data.totalUsers)
        setReportCount(res.data.count);
     } catch (err) {
@@ -58,7 +59,7 @@ export default function AdminDashboard() {
 
   const fetchHazard=async()=>{
      try {
-      const res = await axios.get('https://safety-management-system-backend.onrender.com/hazard/get',{ withCredentials: true });
+      const res = await api.get('/hazard/get',{ withCredentials: true });
       const hazard=res.data.data || [];
       const activeCount=hazard.filter((h)=> h.status?.toLowerCase() === 'open').length;
       setHazardCount(activeCount);
@@ -70,7 +71,7 @@ export default function AdminDashboard() {
   const fetchRecentActivity=async()=>{
     try{
       setLoading(true);
-      const res=await axios.get('https://safety-management-system-backend.onrender.com/activity/recent',{withCredentials:true});
+      const res=await api.get('/activity/recent',{withCredentials:true});
       //console.log(res.data)
       if (res.data.success) {
           setActivities(res.data.data); 
@@ -81,7 +82,6 @@ export default function AdminDashboard() {
        setLoading(false);
     }
   }
-
 
 
   const recentReports = [...reports]
