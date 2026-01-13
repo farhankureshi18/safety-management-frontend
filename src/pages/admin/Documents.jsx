@@ -1,18 +1,31 @@
 import { AdminLayout } from "@/components/layouts/AdminLayout";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { FolderOpen, FileText, File, FileSpreadsheet, Download, Upload, Search, MoreHorizontal, Eye, Trash2 } from "lucide-react";
+import { FolderOpen, FileText, File, FileSpreadsheet, Download, Upload, MoreHorizontal, Trash2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useEffect, useState } from "react";
+import ShowDocForm from "./ShowDocForm";
+import api from "@/api/axiosInstance";
 
-const documents = [
-  { id: 1, name: "Safety Policy Manual 2024", type: "pdf", size: "2.4 MB", category: "Policies", uploadedBy: "John Doe", uploadedDate: "Dec 15, 2024" },
-  { id: 2, name: "Emergency Response Procedures", type: "pdf", size: "1.8 MB", category: "Procedures", uploadedBy: "Sarah Miller", uploadedDate: "Dec 10, 2024" },
-  { id: 3, name: "Risk Assessment Template", type: "xlsx", size: "156 KB", category: "Templates", uploadedBy: "John Doe", uploadedDate: "Nov 28, 2024" },
-  { id: 4, name: "Incident Report Form", type: "docx", size: "89 KB", category: "Forms", uploadedBy: "Emily Watson", uploadedDate: "Nov 20, 2024" },
-  { id: 5, name: "Training Completion Records", type: "xlsx", size: "340 KB", category: "Records", uploadedBy: "Robert Chen", uploadedDate: "Nov 15, 2024" },
-  { id: 6, name: "Safety Audit Checklist Q4", type: "pdf", size: "520 KB", category: "Audits", uploadedBy: "Lisa Brown", uploadedDate: "Nov 1, 2024" },
+
+const CATEGORIES = [
+  { label: "Policies", value: "policy" },
+  { label: "Procedures", value: "procedure" },
+  { label: "Templates", value: "template" },
+  { label: "Forms", value: "form" },
+  { label: "Records", value: "record" },
+  { label: "Audits", value: "audit" },
 ];
+
+const TYPE_LABEL = {
+  policy: "Policy",
+  procedure: "Procedure",
+  template: "Template",
+  form: "Form",
+  record: "Record",
+  audit: "Audit",
+};
+
 
 const getFileIcon = (type) => {
   switch (type) {
@@ -20,87 +33,165 @@ const getFileIcon = (type) => {
       return <FileText className="w-8 h-8 text-destructive" />;
     case "xlsx":
       return <FileSpreadsheet className="w-8 h-8 text-success" />;
-    case "docx":
-      return <File className="w-8 h-8 text-info" />;
     default:
       return <File className="w-8 h-8 text-muted-foreground" />;
   }
 };
 
+
 export default function Documents() {
+  const [documents, setDocuments] = useState([]);
+  const [activeType, setActiveType] = useState("");
+  const [docForm, setDocForm] = useState(false);
+  const [counts, setCounts] = useState({});
+
+  const fetchCounts = async () => {
+    try {
+      const results = await Promise.all(
+        CATEGORIES.map((cat) =>
+          api.get(`/documents/type/${cat.value}`)
+        )
+      );
+
+      const countMap = {};
+      results.forEach((res, idx) => {
+        countMap[CATEGORIES[idx].value] = res.data.data.length;
+      });
+
+      setCounts(countMap);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchByType = async (type) => {
+    try {
+      setActiveType(type);
+      const res = await api.get(`/documents/type/${type}`);
+      setDocuments(res.data.data || []);
+    } catch (err) {
+      console.error(err);
+      setDocuments([]);
+    }
+  };
+
+  const deleteDocument = async (id) => {
+    try {
+      await api.delete(`/documents/delete/${id}`);
+      fetchByType(activeType);
+      fetchCounts();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchCounts();
+  }, []);
+
+
   return (
     <AdminLayout>
       <PageHeader
         title="Documents"
         subtitle="Manage safety documents, policies, and procedures"
         action={
-          <Button>
+          <Button onClick={() => setDocForm(true)}>
             <Upload className="w-4 h-4 mr-2" />
             Upload Document
           </Button>
         }
       />
 
-      {/* Search */}
-      <div className="mb-6 flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Search documents..." className="pl-10" />
-        </div>
-      </div>
+      {docForm && (
+        <ShowDocForm
+          onClose={() => setDocForm(false)}
+          onSuccess={() => {
+            fetchCounts();
+            if (activeType) fetchByType(activeType);
+          }}
+        />
+      )}
 
-      {/* Folder Categories */}
       <div className="mb-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-        {["Policies", "Procedures", "Templates", "Forms", "Records", "Audits"].map((category) => (
-          <div key={category} className="flex flex-col items-center p-4 rounded-xl border border-border bg-card hover:bg-muted/50 cursor-pointer transition-colors">
+        {CATEGORIES.map((cat) => (
+          <div
+            key={cat.value}
+            onClick={() => fetchByType(cat.value)}
+            className={`relative flex flex-col items-center p-4 rounded-xl border cursor-pointer transition
+              ${activeType === cat.value ? "border-blue-500 border-2" : "border-border"}
+            `}
+          >
             <FolderOpen className="w-8 h-8 text-warning mb-2" />
-            <span className="text-sm font-medium text-foreground">{category}</span>
+
+            {/* COUNT BADGE */}
+            <span className="absolute top-2 right-2 bg-muted text-xs px-2 py-0.5 rounded-full">
+              {counts[cat.value] ?? 0}
+            </span>
+
+            <span className="text-sm font-medium">{cat.label}</span>
           </div>
         ))}
       </div>
 
-      {/* Documents Grid */}
-      <h3 className="text-lg font-semibold text-foreground mb-4">Recent Documents</h3>
+      <h3 className="text-lg font-semibold mb-4">
+        {activeType
+          ? `${TYPE_LABEL[activeType]} Documents`
+          : "Select a category to view documents"}
+      </h3>
+
+      {activeType && documents.length === 0 && (
+        <div className="text-center py-10 text-muted-foreground">
+          No {TYPE_LABEL[activeType]} files found
+        </div>
+      )}
+
       <div className="grid gap-4">
         {documents.map((doc) => (
-          <div key={doc.id} className="bg-card rounded-xl border border-border p-4 hover:shadow-soft transition-shadow">
+          <div
+            key={doc._id}
+            className="bg-card rounded-xl border p-4 hover:shadow-soft transition"
+          >
             <div className="flex items-center gap-4">
-              <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-muted/50 flex items-center justify-center">{getFileIcon(doc.type)}</div>
-              <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-foreground truncate">{doc.name}</h4>
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground mt-1">
-                  <span className="uppercase font-medium">{doc.type}</span>
-                  <span>•</span>
-                  <span>{doc.size}</span>
-                  <span>•</span>
-                  <span>{doc.category}</span>
-                  <span className="hidden sm:inline">•</span>
-                  <span className="hidden sm:inline">{doc.uploadedDate}</span>
-                </div>
+              <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
+                {getFileIcon(doc.type)}
               </div>
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" className="hidden sm:flex">
-                  <Download className="w-4 h-4" />
-                </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <MoreHorizontal className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
-                      <Eye className="w-4 h-4 mr-2" /> View
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Download className="w-4 h-4 mr-2" /> Download
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="text-destructive">
-                      <Trash2 className="w-4 h-4 mr-2" /> Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+
+                <div className="flex-1 min-w-0">
+                 <h4 className="font-medium text-foreground truncate">{doc.title}</h4>
+                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground mt-1">
+                   <span className="uppercase font-medium">{doc.type}</span>
+                   <span>•</span>
+                   <span>{(doc.file.size / 1024).toFixed(2)} KB</span>
+                   {/* <span>•</span> */}
+                  {/* <span>{doc.uploadedBy.name}</span> */}
+                   <span className="hidden sm:inline">•</span>
+                   <span className="hidden sm:inline">{new Date(doc.createdAt).toLocaleDateString()}</span>
+                 </div>
+               </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() =>window.open(  `${import.meta.env.VITE_API_BASE_ADDRESS}/documents/download/${doc._id}`,  "_blank") } >
+                <Download className="w-4 h-4" />
+              </Button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <MoreHorizontal className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    className="text-destructive"
+                    onClick={() => deleteDocument(doc._id)}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         ))}

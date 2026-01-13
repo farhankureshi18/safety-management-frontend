@@ -22,19 +22,27 @@ export default function EmployeeDashboard() {
     fetchDashBoardData();
   },[])
 
-  const fetchDashBoardData=async()=>{
-    try{
-      setLoading(true);
-      const reportRes=await api.get('/report/getById/me');
-      const actionRes=await api.get('/action/getById/me');
-      setReports(reportRes.data || [])
-      setActions(actionRes.data || [])
-    }catch(err){
-      console.error(err);
-    }finally{
-      setLoading(false);    
-    }
+  const fetchDashBoardData = async () => {
+  try {
+    setLoading(true);
+
+    const token = localStorage.getItem("token"); 
+    if (!token) throw new Error("No token found");
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+    const reportRes = await api.get('/report/getById/me', config);
+    const actionRes = await api.get('/action/getById/me', config);
+    setReports(Array.isArray(reportRes.data) ? reportRes.data : []);
+    setActions(Array.isArray(actionRes.data) ? actionRes.data : []);
+  } catch (err) {
+    console.error("Dashboard fetch error:", err);
+  } finally {
+    setLoading(false);
   }
+};
+
+
 
   const pendingActions=actions.filter((a)=>a.status === "In Progress" || a.status === 'Pending');
 

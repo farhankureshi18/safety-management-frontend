@@ -47,8 +47,10 @@ export function AdminLayout({ children }) {
   const fetchUser = async () => {
     try {
       const res = await api.get("/auth/me", {
-        withCredentials: true
-      });
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
       setUser(res.data.user);
     } catch (error) {
       console.error("Failed to fetch user info", error);
@@ -69,17 +71,18 @@ export function AdminLayout({ children }) {
           </Button>
           <Button onClick={async () => {
               try {
-                await api.post(
-                  "/auth/logout",
-                  {},
-                  { withCredentials: true }
-                );
-                toast.dismiss(t);
-                navigate("/login", { replace: true });
-              } catch (error) {
-                toast.error("Logout failed");
-                console.error("Logout failed", error);
-              }
+                  await api.post("/auth/logout"); 
+                  localStorage.removeItem("token");
+                  localStorage.removeItem("user");
+
+                  toast.dismiss(t);
+                  toast.success("Logged out successfully");
+
+                  window.location.href = "/login";
+                } catch (error) {
+                  toast.error("Logout failed");
+                  console.error("Logout failed", error);
+                }
             }}
             className="px-3 py-1 text-sm rounded-md bg-red-600 text-white hover:bg-red-700" >
             Logout
@@ -95,6 +98,10 @@ export function AdminLayout({ children }) {
 
   useEffect(()=>{
     fetchUser();
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
   },[])
 
   const NavContent = () => (
@@ -137,7 +144,7 @@ export function AdminLayout({ children }) {
         <div className="flex items-center gap-3 px-4 py-3">
           <div className="w-9 h-9 rounded-full bg-sidebar-accent flex items-center justify-center">
             <span className="text-sm font-medium text-sidebar-foreground">
-              {user ? user.name.split(" ").map(n => n[0]).join("") : "??"}
+               {user?.name ? user.name.split(" ").map(n => n[0]).join("") : "??"}
             </span>
           </div>
           <div className="flex-1 min-w-0">

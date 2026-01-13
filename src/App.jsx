@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import ProtectedRoute from "./pages/ProtectedRoutes";
 
 // Auth Pages
 import Login from "./pages/Login";
@@ -50,25 +51,56 @@ const App = () => (
 
 
           {/* Admin Routes */}
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/users" element={<UserManagement />} />
-          <Route path="/admin/reports" element={<AllReports />} />
-          <Route path="/admin/hazards" element={<HazardsOverview />} />
-          <Route path="/admin/documents" element={<Documents />} />
+          <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}>
+                <AdminDashboard />
+              </ProtectedRoute>} />
+          <Route path="/admin/users" element={<ProtectedRoute allowedRoles={["admin"]}>
+                    <UserManagement />
+                  </ProtectedRoute>} />
+          <Route path="/admin/reports"element={<ProtectedRoute allowedRoles={["admin"]}>
+                    <AllReports />
+                  </ProtectedRoute>}  />
+          <Route path="/admin/hazards" element={<ProtectedRoute allowedRoles={["admin"]}>
+                    <HazardsOverview />
+                  </ProtectedRoute>}  />
+          <Route path="/admin/documents"element={<ProtectedRoute allowedRoles={["admin"]}>
+                    <Documents />
+                  </ProtectedRoute>}  />
           {/* <Route path="/admin/audit-logs" element={<AuditLogs />} /> */}
           
 
           {/* Manager Routes */}
-          <Route path="/manager" element={<ManagerDashboard />} />
-          <Route path="/manager/reports" element={<ReportsReview />} />
-          <Route path="/manager/hazards" element={<HazardManagement />} />
-          <Route path="/manager/actions" element={<CorrectiveActions />} />
+          <Route path="/manager" element={
+            <ProtectedRoute allowedRoles={["manager"]}>
+              <ManagerDashboard />
+            </ProtectedRoute>}/>
+          <Route path="/manager/reports"element={
+            <ProtectedRoute allowedRoles={["manager"]}>
+              <ReportsReview />
+            </ProtectedRoute>} />
+          <Route path="/manager/hazards" element={
+            <ProtectedRoute allowedRoles={["manager"]}>
+              <HazardManagement />
+            </ProtectedRoute>} />
+          <Route path="/manager/actions"element={
+            <ProtectedRoute allowedRoles={["manager"]}>
+              <CorrectiveActions />
+            </ProtectedRoute>} />
           {/* <Route path="/manager/notifications" element={<ManagerNotifications />} /> */}
 
           {/* Employee Routes */}
-          <Route path="/employee" element={<EmployeeDashboard />} />
-          <Route path="/employee/submit-report" element={<SubmitReport />} />
-          <Route path="/employee/my-actions" element={<MyActions />} />
+          <Route path="/employee" element={
+            <ProtectedRoute allowedRoles={["employee"]}>
+              <EmployeeDashboard />
+            </ProtectedRoute>}/>
+          <Route path="/employee/submit-report"element={
+            <ProtectedRoute allowedRoles={["employee"]}>
+              <SubmitReport />
+            </ProtectedRoute>} />
+          <Route path="/employee/my-actions" element={
+          <ProtectedRoute allowedRoles={["employee"]}>
+            <MyActions />
+          </ProtectedRoute>} />
           {/* <Route path="/employee/notifications" element={<EmployeeNotifications />} /> */}
 
           {/* Catch-all */}

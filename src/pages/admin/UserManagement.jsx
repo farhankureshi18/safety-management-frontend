@@ -47,6 +47,7 @@ export default function UserManagement() {
   useEffect(() => {
     fetchUsers(page);
   }, []);
+  
 
 
    const columns = [

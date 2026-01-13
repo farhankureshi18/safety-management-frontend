@@ -17,23 +17,28 @@ export default function Login() {
 
   const navigate=useNavigate();
 
-  const handleSubmit =async (e) => {
-    e.preventDefault();
-    try{
-      console.log({email,password});
-      const res=await api.post("/auth/login",{email,password},{withCredentials:true});
-      //console.log(res);
-       const role = res.data.user.role;
-      toast.success('Login Successfully');
-      if (role === "admin") navigate("/admin");
-      else if (role === "manager") navigate("/manager");
-      else navigate("/employee");
-    }catch(err){
-      console.log(err);
-       toast.error(err.response?.data?.message || "Login failed");
-    }
-  };
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const res = await api.post("/auth/login", { email, password });
+    
+    const token = res.data.token;
+    const user = res.data.user;
 
+    // Store in localStorage
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+
+    toast.success("Login Successfully");
+
+    if (user.role === "admin") navigate("/admin");
+    else if (user.role === "manager") navigate("/manager");
+    else navigate("/employee");
+  } catch (err) {
+    console.log(err);
+    toast.error(err.response?.data?.message || "Login failed");
+  }
+};
   return (
     <div className="min-h-screen flex">
       {/* Left Panel - Branding */}

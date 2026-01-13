@@ -26,6 +26,7 @@
     const[getHazards,setGetHazards]=useState([]);
     const[editingHazard,setEditingHazard]=useState(null);
     const [searchText, setSearchText] = useState("");
+    const [empSearch, setEmpSearch] = useState("");
     const [searchLoading, setSearchLoading] = useState(false);
     const [statusFilter, setStatusFilter] = useState("ALL");
     const [riskFilter, setRiskFilter] = useState("ALL");
@@ -63,6 +64,24 @@
         setSearchLoading(false);
       }
     }
+
+
+    const searchHazardByEmp = async (value) => {
+      if (!value.trim()) {
+        fetchHazards();
+        return;
+      }
+      try {
+        const res = await api.get(
+          `/hazard/search/employee?name=${value}`
+        );
+        setGetHazards(res.data.data);
+      } catch (err) {
+        console.error(err);
+        setGetHazards([]);
+      }
+    };
+
 
     // const filterByStatus = async (status) => {
     //   if (status === "ALL") {
@@ -128,6 +147,21 @@
               searchHazard(value);
             }}/>
           </div>
+
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Search By Assigned To..."
+              className="pl-10"
+              value={empSearch}
+              onChange={(e) => {
+                const value = e.target.value;
+                setEmpSearch(value);
+                searchHazardByEmp(value);
+              }}
+            />
+          </div>
+
           <div className="flex gap-3">
             {/* <Select  value={riskFilter}
               onValueChange={(value) => {

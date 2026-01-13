@@ -22,6 +22,8 @@ export default function ReportsReview() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedReport, setSelectedReport] = useState(null);
   const [openView, setOpenView] = useState(false);
+  const [searchEmployee, setSearchEmployee] = useState("");
+
 
 
   /*Pagination constant value */
@@ -45,20 +47,16 @@ export default function ReportsReview() {
     }
   }
 
-  const handleSearch=async()=>{
-    if(!searchTitle.trim()){
-      fetchAllReports();
-      return;
-    }
-    try{
-      const res=await api.get(`/report/search?title=${searchTitle}`);
-      setReports(res.data.data);
-      setViewLabel(`Showing results for search: "${searchTitle}"`);
-    }catch(err){
-      console.log(err);
-      setReports([]);
-    }
+const handleSearch = async () => {
+  try {
+    const res = await api.get(`/report/search?title=${searchTitle}`);
+    setReports(res.data.data);
+    setViewLabel(`Showing results for: "${searchTitle}"`);
+  } catch (err) {
+    console.error(err);
+    setReports([]);
   }
+};
 
   const handleStatusFilter=async(value)=>{
     setStatus(value);
@@ -114,14 +112,54 @@ export default function ReportsReview() {
   }
 };
 
+const searchByEmployee = async () => {
+  try {
+    const res = await api.get(
+      `/auth/search/employee?name=${searchEmployee}`
+    );
+    setReports(res.data.data);
+    setViewLabel(`Showing results for employee: "${searchEmployee}"`);
+  } catch (err) {
+    console.error(err);
+    setReports([]);
+  }
+};
+
 
   useEffect(()=>{
     fetchAllReports();
   },[])
 
+
   useEffect(() => {
   setCurrentPage(1);
 }, [reports]);
+
+
+useEffect(() => {
+  const delay = setTimeout(() => {
+    if (!searchTitle.trim()) {
+      fetchAllReports();
+      setViewLabel("Showing all reports");
+    } else {
+      handleSearch();
+    }
+  }, 400); 
+  return () => clearTimeout(delay);
+}, [searchTitle]);
+
+
+  useEffect(() => {
+  const delay = setTimeout(() => {
+    if (!searchEmployee.trim()) {
+      fetchAllReports();
+      setViewLabel("Showing all reports");
+    } else {
+      searchByEmployee();
+    }
+  }, 400);
+  return () => clearTimeout(delay);
+}, [searchEmployee]);
 
 
 
@@ -137,11 +175,10 @@ export default function ReportsReview() {
         <div className="relative flex-1 max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
-        placeholder="Search By Entering Title"
+        placeholder="Search By Title"
         className="pl-10"
         value={searchTitle}
         onChange={(e)=>setSearchTitle(e.target.value)}
-        onKeyDown={(e)=>e.key === 'Enter' && handleSearch()}
       />
         </div>
         {/* filter by priority */}
@@ -171,6 +208,16 @@ export default function ReportsReview() {
               <SelectItem value="Low">Low</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+
+          <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Search By Employee"
+            className="pl-10"
+            value={searchEmployee}
+            onChange={(e) => setSearchEmployee(e.target.value)}
+          />
         </div>
       </div>
 
