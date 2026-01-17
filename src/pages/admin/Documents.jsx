@@ -149,6 +149,7 @@ const fetchAllDocuments = async () => {
             Upload Document
           </Button>
         }
+        notifications={notifications}
       />
 
       {docForm && (

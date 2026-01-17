@@ -3,6 +3,8 @@ import axios from "axios";
 import { ManagerLayout } from "@/components/layouts/ManagerLayout";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
+import api from "../../api/axiosInstance";
+
 import {
   Bell,
   AlertTriangle,
