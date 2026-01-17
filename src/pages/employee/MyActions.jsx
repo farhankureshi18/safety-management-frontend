@@ -7,11 +7,18 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Calendar,Loader } from "lucide-react";
 import api from "../../api/axiosInstance";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 
 export default function MyActions() {
   const [actions, setActions] = useState([]);
   const[loadingId,setLoadingId]=useState([]);
+  const [notifications, setNotifications] = useState([]);
+
 
   useEffect(() => {
     fetchMyActions();
@@ -22,13 +29,29 @@ export default function MyActions() {
       const res = await api.get(
         "/action/get ",
         {
-          withCredentials: true, //to sent cookie from browser
+          withCredentials: true, 
         }
       );
 
       setActions(res.data.actions);
     } catch (error) {
       console.error("Error fetching actions:", error);
+    }
+  };
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await api.get(
+        "/notifications/Employee",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setNotifications(res.data);
+    } catch (err) {
+      console.error("Error fetching notifications:", err.response?.data);
     }
   };
 
@@ -45,14 +68,18 @@ export default function MyActions() {
       console.error("Failed to update status:", error);
     } finally {
     setLoadingId((prev) => prev.filter((lid) => lid !== id)); // stop loading
+   }
   }
-  }
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
 
   return (
     <EmployeeLayout>
       <PageHeader
         title="My Actions"
         subtitle="View and complete your assigned tasks"
+        notifications={notifications}  
       />
 
       <div className="space-y-4">
@@ -83,7 +110,7 @@ export default function MyActions() {
 
               
               <div className="flex gap-2 mt-2 sm:mt-0">
-              <Button
+              {/* <Button
                 size="sm"
                 className="bg-success hover:bg-success/90"
                 disabled={loadingId.includes(action._id)}
@@ -109,7 +136,54 @@ export default function MyActions() {
                   <Loader className="w-4 h-4 mr-2" />
                 )}
                 In-Progress
-              </Button>
+              </Button> */}
+
+              <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm">
+                  Update Status
+                </Button>
+              </PopoverTrigger>
+
+              <PopoverContent className="w-64 p-4">
+                <h4 className="font-semibold text-sm mb-3">
+                  Update Your Task
+                </h4>
+
+                <div className="flex flex-col gap-2">
+                  {/* Completed */}
+                  <Button
+                    size="sm"
+                    className="bg-success hover:bg-success/90 justify-start"
+                    disabled={loadingId.includes(action._id)}
+                    onClick={() => updateStatus(action._id, "Completed")}
+                  >
+                    {loadingId.includes(action._id) ? (
+                      <Loader className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                    )}
+                    Completed
+                  </Button>
+
+                  {/* In Progress */}
+                  <Button
+                    size="sm"
+                    className="bg-yellow-600 hover:bg-yellow-700/90 justify-start"
+                    disabled={loadingId.includes(action._id)}
+                    onClick={() => updateStatus(action._id, "In Progress")}
+                  >
+                    {loadingId.includes(action._id) ? (
+                      <Loader className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Loader className="w-4 h-4 mr-2" />
+                    )}
+                    In Progress
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+
             </div>
 
             </div>

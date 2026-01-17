@@ -16,6 +16,8 @@ import UserManagement from "./pages/admin/UserManagement";
 import AllReports from "./pages/admin/AllReports";
 import HazardsOverview from "./pages/admin/HazardsOverview";
 import Documents from "./pages/admin/Documents";
+import AdminNotifications from "./pages/admin/AdminNotification";
+
 // import AuditLogs from "./pages/admin/AuditLogs";
 
 // Manager Pages
@@ -63,8 +65,11 @@ const App = () => (
           <Route path="/admin/hazards" element={<ProtectedRoute allowedRoles={["admin"]}>
                     <HazardsOverview />
                   </ProtectedRoute>}  />
-          <Route path="/admin/documents"element={<ProtectedRoute allowedRoles={["admin"]}>
+          <Route path="/admin/documents"element={<ProtectedRoute allowedRoles={["admin","manager"]}>
                     <Documents />
+                  </ProtectedRoute>}  />
+          <Route path="/admin/notifications"element={<ProtectedRoute allowedRoles={["admin"]}>
+                    <AdminNotifications />
                   </ProtectedRoute>}  />
           {/* <Route path="/admin/audit-logs" element={<AuditLogs />} /> */}
           
@@ -86,7 +91,10 @@ const App = () => (
             <ProtectedRoute allowedRoles={["manager"]}>
               <CorrectiveActions />
             </ProtectedRoute>} />
-          {/* <Route path="/manager/notifications" element={<ManagerNotifications />} /> */}
+          <Route path="/manager/notifications"element={
+            <ProtectedRoute allowedRoles={["manager"]}>
+              <ManagerNotifications />
+            </ProtectedRoute>} />
 
           {/* Employee Routes */}
           <Route path="/employee" element={
@@ -101,7 +109,10 @@ const App = () => (
           <ProtectedRoute allowedRoles={["employee"]}>
             <MyActions />
           </ProtectedRoute>} />
-          {/* <Route path="/employee/notifications" element={<EmployeeNotifications />} /> */}
+           <Route path="/employee/notifications" element={
+          <ProtectedRoute allowedRoles={["employee"]}>
+            <EmployeeNotifications />
+          </ProtectedRoute>} />
 
           {/* Catch-all */}
           <Route path="*" element={<NotFound />} />

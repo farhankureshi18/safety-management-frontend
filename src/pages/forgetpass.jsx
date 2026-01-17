@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import api from "../api/axiosInstance";
+import { Loader2 } from "lucide-react";
+
 
 
 export default function ForgetPass() {
@@ -14,9 +16,12 @@ export default function ForgetPass() {
   const [step, setStep] = useState(1);
   const [newPass, setNewPass] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const sendOtp = async () => {
+    setLoading(true);
     try {
       const res = await api.post("/auth/send-otp", { email });
       toast.success(res.data.message);
@@ -66,7 +71,16 @@ export default function ForgetPass() {
                 placeholder="Enter your registered email"
               />
             </div>
-            <Button onClick={sendOtp} className="w-full">Send OTP</Button>
+              <Button onClick={sendOtp} disabled={loading} className="w-full">
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Sending OTP...
+                  </span>
+                ) : (
+                  "Send OTP"
+                )}
+              </Button>
             <p className="text-sm mt-2">
               <Link to="/login" className="text-accent hover:underline">Back to Login</Link>
             </p>
@@ -115,3 +129,7 @@ export default function ForgetPass() {
     </div>
   );
 }
+
+
+
+

@@ -30,6 +30,8 @@
     const [searchLoading, setSearchLoading] = useState(false);
     const [statusFilter, setStatusFilter] = useState("ALL");
     const [riskFilter, setRiskFilter] = useState("ALL");
+    const [notifications, setNotifications] = useState([]);
+
 
     const fetchHazards=async()=>{
       try{
@@ -82,6 +84,22 @@
       }
     };
 
+     const fetchNotifications = async () => {
+    try {
+      const res = await api.get(
+        "/notifications/Manager",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setNotifications(res.data);
+    } catch (err) {
+      console.error("Error fetching notifications:", err.response?.data);
+    }
+  };
+
 
     // const filterByStatus = async (status) => {
     //   if (status === "ALL") {
@@ -114,6 +132,7 @@
 
     useEffect(()=>{
       fetchHazards();
+      fetchNotifications();
     },[])
 
     return (
@@ -127,6 +146,7 @@
               Add Hazard
             </Button>
           }
+          notifications={notifications}
         />
 
         {showHazardPage && (

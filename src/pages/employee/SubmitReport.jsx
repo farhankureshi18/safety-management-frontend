@@ -13,13 +13,15 @@ import {
 } from "@/components/ui/select";
 import {toast} from "@/components/ui/sonner"
 import { Upload, Send } from "lucide-react";
-import { useState } from "react";
+import { useState ,useEffect} from "react";
 import api from "../../api/axiosInstance";
 import axios from "axios";
 
 export default function SubmitReport() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+
 
   const [formData, setFormData] = useState({
     reportTitle: "",
@@ -80,6 +82,27 @@ export default function SubmitReport() {
     }
   };
 
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await api.get(
+        "/notifications/Employee",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setNotifications(res.data);
+    } catch (err) {
+      console.error("Error fetching notifications:", err.response?.data);
+    }
+  };
+
+  useEffect(() => {
+      fetchNotifications();
+    }, []);
+
   if (submitted) {
     return (
       <EmployeeLayout>
@@ -104,6 +127,7 @@ export default function SubmitReport() {
       <PageHeader
         title="Submit Safety Report"
         subtitle="Report a safety concern or incident"
+        notifications={notifications}  
       />
 
       <div className="max-w-2xl">

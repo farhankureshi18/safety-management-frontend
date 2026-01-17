@@ -8,17 +8,22 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import axios from "axios";
 import api from '../api/axiosInstance'
+import { Loader2 } from "lucide-react";
+
 
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
 
   const navigate=useNavigate();
 
   const handleSubmit = async (e) => {
   e.preventDefault();
+  setLoading(true);
   try {
     const res = await api.post("/auth/login", { email, password });
     
@@ -37,6 +42,8 @@ export default function Login() {
   } catch (err) {
     console.log(err);
     toast.error(err.response?.data?.message || "Login failed");
+  }finally {
+    setLoading(false); 
   }
 };
   return (
@@ -125,8 +132,15 @@ export default function Login() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full h-12 text-base font-medium">
-              Sign In
+            <Button type="submit" className="w-full h-12 text-base font-medium"  disabled={loading}>
+               {loading ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                   Signing In....
+                  </span>
+                ) : (
+                 'Sign In'
+                )}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </form>

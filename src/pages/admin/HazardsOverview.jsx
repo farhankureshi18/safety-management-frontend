@@ -24,6 +24,7 @@ import api from "../../api/axiosInstance";
     const[searchText, setSearchText] = useState("");
     const[searchLoading, setSearchLoading] = useState(false);
     const [riskFilter, setRiskFilter] = useState("ALL");
+    const [notifications, setNotifications] = useState([]);
 
     const fetchHazards=async()=>{
       try{
@@ -49,6 +50,26 @@ import api from "../../api/axiosInstance";
         setSearchLoading(false);
       }
     }
+
+    const fetchNotifications = async () => {
+    try {
+      const res = await api.get(
+        "/notifications/Admin",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setNotifications(res.data);
+    } catch (err) {
+      console.error("Error fetching notifications:", err.response?.data);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
   
     useEffect(()=>{
       fetchHazards();
@@ -73,7 +94,7 @@ import api from "../../api/axiosInstance";
 
     return (
    <AdminLayout>
-      <PageHeader title="Hazards Overview" subtitle="Monitor and manage identified hazards across all locations" />
+      <PageHeader title="Hazards Overview" subtitle="Monitor and manage identified hazards across all locations"  notifications={notifications}  />
 
       {/* KPI Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

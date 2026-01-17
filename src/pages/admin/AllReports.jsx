@@ -6,11 +6,11 @@ import { Input } from "@/components/ui/input";
 import {Dialog,DialogContent,DialogHeader,DialogTitle} from "@/components/ui/dialog"
 import { toast } from "@/components/ui/use-toast";
 import {Select,SelectContent,  SelectItem,SelectTrigger,SelectValue,} from "@/components/ui/select";
-import { Search, Eye, CheckCircle, XCircle } from "lucide-react";
+import { Search, Eye, CheckCircle, XCircle ,Plus,Trash} from "lucide-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import api from '../../api/axiosInstance'
-
+import AddActionPage from "../manager/AddActionPage";
 
 
 export default function ReportsReview() {
@@ -23,6 +23,9 @@ export default function ReportsReview() {
   const [selectedReport, setSelectedReport] = useState(null);
   const [openView, setOpenView] = useState(false);
   const [searchEmployee, setSearchEmployee] = useState("");
+  const[showActionPage,setShowActionPage]=useState(false)
+  const [deleteId, setDeleteId] = useState(null);
+  const [notifications, setNotifications] = useState([]);
 
 
 
@@ -125,6 +128,25 @@ const searchByEmployee = async () => {
   }
 };
 
+const fetchNotifications = async () => {
+    try {
+      const res = await api.get(
+        "/notifications/Admin",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setNotifications(res.data);
+    } catch (err) {
+      console.error("Error fetching notifications:", err.response?.data);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
 
   useEffect(()=>{
     fetchAllReports();
@@ -168,6 +190,13 @@ useEffect(() => {
       <PageHeader
         title="Reports Review"
         subtitle="Review and process submitted safety reports"
+        action={
+          <Button onClick={() => setShowActionPage(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Create Action
+          </Button>
+        }
+         notifications={notifications}  
       />
 
       {/* Filters */}
@@ -221,51 +250,117 @@ useEffect(() => {
         </div>
       </div>
 
+        {showActionPage && <AddActionPage onClose={() => setShowActionPage(false)} />}
+
         <div className="mb-4 text-sm text-muted-foreground">
           {viewLabel}
         </div>
 
-
-      {/*View Box*/}
+        {/* View report */}
       {openView && selectedReport && (
-            <Dialog open={openView} onOpenChange={setOpenView}>
-              <DialogContent className="max-w-xl">
-                <DialogHeader>
-                  <DialogTitle>{selectedReport.reportTitle}</DialogTitle>
-                </DialogHeader>
+  <Dialog open={openView} onOpenChange={setOpenView}>
+    <DialogContent className="max-w-3xl p-0 overflow-hidden">
 
-              {/* IMAGE */}
-             {selectedReport?.attachment?.url ? (
-              <img
-                src={selectedReport.attachment.url}
-                alt="report"
-                className="w-full h-48 object-contain rounded"
-              />
-            ) : (
-              <p className="text-sm text-muted-foreground">No attachment</p>
-            )}
+      {/* ===== Header ===== */}
+      <div className="px-6 py-4 border-b">
+        <h2 className="text-xl font-semibold tracking-tight">
+          {selectedReport.reportTitle}
+        </h2>
+        <p className="text-sm text-muted-foreground mt-1">
+          Report ID • {selectedReport._id.slice(-6)}
+        </p>
+      </div>
 
-
-              {/* DETAILS */}
-              <div className="space-y-2 text-sm">
-                <p><b>Category:</b> {selectedReport.category}</p>
-                <p><b>Priority:</b> {selectedReport.priority}</p>
-                <p><b>Status:</b> {selectedReport.status}</p>
-                <p><b>Location:</b> {selectedReport.location}</p>
-                <p><b>Description:</b> {selectedReport.description}</p>
-
-                <hr />
-
-                <p><b>Reported By:</b> {selectedReport.reportedBy?.name}</p>
-                <p><b>Department:</b> {selectedReport.reportedBy?.department}</p>
-                <p>
-                  <b>Date:</b>{" "}
-                  {new Date(selectedReport.createdAt).toLocaleString()}
-                </p>
-              </div>
-            </DialogContent>
-          </Dialog>
+      {/* ===== Image Section ===== */}
+      {selectedReport?.attachment?.url ? (
+        <div className="bg-muted">
+          <img
+            src={selectedReport.attachment.url}
+            alt="Report Attachment"
+            className="w-full max-h-[280px] object-contain mx-auto"
+          />
+        </div>
+      ) : (
+        <div className="h-40 flex items-center justify-center text-sm text-muted-foreground">
+          No attachment available
+        </div>
       )}
+
+      {/* ===== Body ===== */}
+      <div className="p-6 space-y-6">
+
+        {/* Status Row */}
+        <div className="flex flex-wrap gap-2">
+          <span className="px-3 py-1 rounded-full text-xs font-medium bg-secondary">
+            {selectedReport.category}
+          </span>
+
+          <span
+            className={`px-3 py-1 rounded-full text-xs font-medium
+              ${selectedReport.priority === "Critical"
+                ? "bg-red-100 text-red-700"
+                : selectedReport.priority === "High"
+                ? "bg-orange-100 text-orange-700"
+                : selectedReport.priority === "Medium"
+                ? "bg-yellow-100 text-yellow-700"
+                : "bg-muted text-muted-foreground"
+              }`}
+          >
+            {selectedReport.priority} Priority
+          </span>
+
+          <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+            {selectedReport.status}
+          </span>
+        </div>
+
+        {/* Description */}
+        <div>
+          <h4 className="text-sm font-semibold text-foreground mb-1">
+            Description
+          </h4>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {selectedReport.description || "No description provided"}
+          </p>
+        </div>
+
+        {/* Info Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+
+          <div className="bg-muted/50 rounded-lg p-4">
+            <p className="text-xs text-muted-foreground">Location</p>
+            <p className="font-medium mt-1">
+              {selectedReport.location || "N/A"}
+            </p>
+          </div>
+
+          <div className="bg-muted/50 rounded-lg p-4">
+            <p className="text-xs text-muted-foreground">Reported Date</p>
+            <p className="font-medium mt-1">
+              {new Date(selectedReport.createdAt).toLocaleString()}
+            </p>
+          </div>
+
+          <div className="bg-muted/50 rounded-lg p-4">
+            <p className="text-xs text-muted-foreground">Reported By</p>
+            <p className="font-medium mt-1">
+              {selectedReport.reportedBy?.name || "N/A"}
+            </p>
+          </div>
+
+          <div className="bg-muted/50 rounded-lg p-4">
+            <p className="text-xs text-muted-foreground">Department</p>
+            <p className="font-medium mt-1">
+              {selectedReport.reportedBy?.department || "N/A"}
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </DialogContent>
+  </Dialog>
+      )}
+
 
 
       {/* Reports Cards */}
@@ -349,6 +444,14 @@ useEffect(() => {
             }}>
               <Eye className="w-4 h-4 mr-2" /> View
             </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setDeleteId(report._id)}
+            >
+              <Trash className="w-4 h-4 mr-2" /> Delete
+            </Button>
           </div>
         </div>
       </div>
@@ -388,6 +491,43 @@ useEffect(() => {
           </Button>
         </div>
       </div>
+
+      
+<Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+  <DialogContent className="max-w-sm">
+    <DialogHeader>
+      <DialogTitle>Delete Report</DialogTitle>
+    </DialogHeader>
+
+    <p className="text-sm text-muted-foreground">
+      Are you sure you want to delete this report?
+    </p>
+
+    <div className="flex justify-end gap-2 mt-4">
+      <Button variant="outline" onClick={() => setDeleteId(null)}>
+        Cancel
+      </Button>
+
+      <Button
+        className="bg-red-600 text-white"
+        onClick={async () => {
+          try {
+            await api.delete(`/report/delete/${deleteId}`);
+            setReports(prev => prev.filter(r => r._id !== deleteId));
+            toast({ title: "Report deleted successfully" });
+          } catch (err) {
+            toast({ title: "Error deleting report" });
+          } finally {
+            setDeleteId(null);
+          }
+        }}
+      >
+        Delete
+      </Button>
+    </div>
+  </DialogContent>
+</Dialog>
+
     </AdminLayout>
   );
 }

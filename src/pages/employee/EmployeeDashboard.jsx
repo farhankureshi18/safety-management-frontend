@@ -8,6 +8,16 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import api from "../../api/axiosInstance";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell
+} from "recharts";
 
 
 
@@ -17,10 +27,44 @@ export default function EmployeeDashboard() {
   const[reports,setReports]=useState([]);
   const[actions,setActions]=useState([]);
   const[loading,setLoading]=useState(false);
+  const [myActionsChart, setMyActionsChart] = useState([]);
+    const [notifications, setNotifications] = useState([]);
+
 
    useEffect(()=>{
     fetchDashBoardData();
+    fetchMyActionsChart();
   },[])
+
+
+    const fetchMyActionsChart = async () => {
+    try {
+      const res = await api.get("/charts/actions-my", {
+        withCredentials: true,
+      });
+
+      setMyActionsChart(res.data.data || []);
+    } catch (err) {
+      console.error("My actions chart error", err);
+    }
+  };
+
+   const fetchNotifications = async () => {
+    try {
+      const res = await api.get(
+        "/notifications/Employee",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setNotifications(res.data);
+    } catch (err) {
+      console.error("Error fetching notifications:", err.response?.data);
+    }
+  };
+
 
   const fetchDashBoardData = async () => {
   try {
@@ -41,6 +85,9 @@ export default function EmployeeDashboard() {
     setLoading(false);
   }
 };
+useEffect(() => {
+    fetchNotifications();
+  }, []);
 
 
 
@@ -70,6 +117,8 @@ export default function EmployeeDashboard() {
             </Link>
           </Button>
         }
+        notifications={notifications}   
+
       />
      
 
@@ -84,6 +133,42 @@ export default function EmployeeDashboard() {
         <KPICard title="My Actions" value={actions.length} subtitle={`${pendingActions.length} in progress`} icon={CheckSquare} variant="warning" />
         <KPICard title="Pending Actions" value={pendingActions.length} subtitle="Need attention" icon={Bell} variant="accent" />
       </div>
+
+
+      <div className="bg-card rounded-xl border border-border p-6 mb-8">
+      <h3 className="text-lg font-semibold mb-4">
+        My Actions Progress
+      </h3>
+
+      {myActionsChart.length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          No actions data available
+        </p>
+      ) : (
+        <ResponsiveContainer width="100%" height={280}>
+          <BarChart data={myActionsChart}>
+            <CartesianGrid strokeDasharray="3 3" />
+           <XAxis dataKey="month" />
+            <YAxis />
+            <Tooltip />
+
+            <Bar dataKey="count" radius={[6, 6, 0, 0]}>
+              {myActionsChart.map((entry, index) => (
+                <Cell
+                  key={index}
+                  fill={
+                    entry.status === "Completed"
+                      ? "#22C55E" // green
+                      : "#F59E0B" // amber
+                  }
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      )}
+    </div>
+
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-card rounded-xl border border-border p-6">

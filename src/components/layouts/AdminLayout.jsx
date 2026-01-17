@@ -12,7 +12,7 @@ import {
   X,  
   Shield,
   LogOut,
-  ChevronRight,
+  ChevronRight,Bell
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
@@ -27,7 +27,8 @@ const adminNavItems = [
   { path: "/admin/reports", label: "All Reports", icon: FileText },
   { path: "/admin/hazards", label: "Hazards Overview", icon: AlertTriangle },
   { path: "/admin/documents", label: "Documents", icon: FolderOpen },
-  // { path: "/admin/audit-logs", label: "Audit Logs", icon: ClipboardList },
+  { path: "/admin/notifications", label: "Notifications", icon: Bell },
+
 ];
 
 export function AdminLayout({ children }) {

@@ -65,6 +65,8 @@ export default function CorrectiveActions() {
   const [searchText, setSearchText] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterEmployee, setFilterEmployee] = useState("all");
+  const [notifications, setNotifications] = useState([]);
+
 
   // Fetch all actions
   const fetchActions = async () => {
@@ -123,6 +125,22 @@ export default function CorrectiveActions() {
     }
   };
 
+   const fetchNotifications = async () => {
+    try {
+      const res = await api.get(
+        "/notifications/Manager",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setNotifications(res.data);
+    } catch (err) {
+      console.error("Error fetching notifications:", err.response?.data);
+    }
+  };
+
   // Apply filters (status + assigned employee)
   const applyFilters = async (status = filterStatus, assignedTo = filterEmployee) => {
     try {
@@ -162,6 +180,7 @@ export default function CorrectiveActions() {
   useEffect(() => {
     fetchActions();
     fetchEmployees();
+    fetchNotifications();
   }, []);
 
   return (
@@ -175,6 +194,7 @@ export default function CorrectiveActions() {
             Create Action
           </Button>
         }
+        notifications={notifications}
       />
       {showActionPage && <AddActionPage onClose={() => setShowActionPage(false)} />}
 
@@ -277,24 +297,7 @@ export default function CorrectiveActions() {
                   <p className="text-sm text-muted-foreground mb-3">{action.description}</p>
 
                   {/* Progress Bar */}
-                  <div className="mb-3">
-                    <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="text-muted-foreground">Progress</span>
-                      <span className="font-medium text-foreground">{action.progress}%</span>
-                    </div>
-                    <div className="h-2 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all ${
-                          action.progress === 100
-                            ? "bg-success"
-                            : action.status === "overdue"
-                            ? "bg-destructive"
-                            : "bg-accent"
-                        }`}
-                        style={{ width: `${action.progress}%` }}
-                      />
-                    </div>
-                  </div>
+                 
 
                   <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1.5">

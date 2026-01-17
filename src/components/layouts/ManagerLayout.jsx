@@ -13,7 +13,7 @@ const managerNavItems = [
   { path: "/manager/reports", label: "Reports Review", icon: FileText },
   { path: "/manager/hazards", label: "Hazard Management", icon: AlertTriangle },
   { path: "/manager/actions", label: "Corrective Actions", icon: CheckSquare },
-  // { path: "/manager/notifications", label: "Notifications", icon: Bell },
+  { path: "/manager/notifications", label: "Notifications", icon: Bell },
 ];
 
 export function ManagerLayout({ children }) {

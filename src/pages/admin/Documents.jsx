@@ -44,6 +44,9 @@ export default function Documents() {
   const [activeType, setActiveType] = useState("");
   const [docForm, setDocForm] = useState(false);
   const [counts, setCounts] = useState({});
+  const [allDocuments, setAllDocuments] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+
 
   const fetchCounts = async () => {
     try {
@@ -64,29 +67,74 @@ export default function Documents() {
     }
   };
 
-  const fetchByType = async (type) => {
+ const fetchByType = async (type) => {
+  try {
+    setActiveType(type);
+    const res = await api.get(`/documents/type/${type}`);
+    setDocuments(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+    setDocuments([]);
+  }
+};
+
+
+const deleteDocument = async (id) => {
+  try {
+    await api.delete(`/documents/delete/${id}`);
+    const updated = allDocuments.filter(doc => doc._id !== id);
+    setAllDocuments(updated);
+    if (activeType) {
+      fetchByType(activeType);
+    } else {
+      setDocuments(updated);
+    }
+    fetchCounts();
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const fetchNotifications = async () => {
     try {
-      setActiveType(type);
-      const res = await api.get(`/documents/type/${type}`);
-      setDocuments(res.data.data || []);
+      const res = await api.get(
+        "/notifications/Admin",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setNotifications(res.data || []);
+      console.log(res.data,'sss')
     } catch (err) {
-      console.error(err);
-      setDocuments([]);
+      console.error("Error fetching notifications:", err.response?.data);
     }
   };
 
-  const deleteDocument = async (id) => {
-    try {
-      await api.delete(`/documents/delete/${id}`);
-      fetchByType(activeType);
-      fetchCounts();
-    } catch (err) {
-      console.error(err);
-    }
-  };
+
+const fetchAllDocuments = async () => {
+  try {
+    const res = await api.get("/documents/fetchAll");
+    const docs = res.data.data || [];
+
+    setAllDocuments(docs);
+    setDocuments(docs);   
+    setActiveType("");
+  } catch (err) {
+    console.error(err);
+    setAllDocuments([]);
+    setDocuments([]);
+  }
+};
+
+
+
 
   useEffect(() => {
+    fetchAllDocuments();
     fetchCounts();
+    fetchNotifications();
   }, []);
 
 
@@ -134,11 +182,12 @@ export default function Documents() {
         ))}
       </div>
 
-      <h3 className="text-lg font-semibold mb-4">
-        {activeType
-          ? `${TYPE_LABEL[activeType]} Documents`
-          : "Select a category to view documents"}
-      </h3>
+        <h3 className="text-lg font-semibold mb-4">
+      {activeType
+        ? `${TYPE_LABEL[activeType]} Documents`
+        : "All Documents"}
+    </h3>
+
 
       {activeType && documents.length === 0 && (
         <div className="text-center py-10 text-muted-foreground">

@@ -23,7 +23,7 @@ const employeeNavItems = [
   { path: "/employee", label: "Dashboard", icon: LayoutDashboard },
   { path: "/employee/submit-report", label: "Submit Report", icon: FileEdit },
   { path: "/employee/my-actions", label: "My Actions", icon: CheckSquare },
-  // { path: "/employee/notifications", label: "Notifications", icon: Bell },
+  { path: "/employee/notifications", label: "Notifications", icon: Bell },
 ];
 
 export function EmployeeLayout({ children }) {

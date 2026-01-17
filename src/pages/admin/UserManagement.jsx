@@ -12,6 +12,8 @@ import Register from "./Register";
 import axios from "axios"
 import { toast } from "sonner";
 import api from "../../api/axiosInstance";
+import {Select,SelectContent,  SelectItem,SelectTrigger,SelectValue,} from "@/components/ui/select";
+
 
 
 export default function UserManagement() {
@@ -23,6 +25,8 @@ export default function UserManagement() {
     const[totalUsers,setTotalUsers]=useState(0);
 
     const[ShowRegisterForm,setShowRegisterForm]=useState(false);
+    const[status,setStatus]=useState('all');
+    const [notifications, setNotifications] = useState([]);
 
     //For Pagination making variables
     const pageSize = 6;
@@ -43,11 +47,46 @@ export default function UserManagement() {
       toast.error("Failed to fetch users");
     }
   };
+  
+const handleDepartmentFilter=async(value)=>{
+  setStatus(value);
+  try {
+    const url = value === "all" ? "/auth/users" : `/auth/department/${value}`;
+    const res = await api.get(url);
+    setUsers( value === "all"? res.data.users || []: res.data.data || []);
+    if (value === "all") {
+      setTotalUsers(res.data.totalUsers);
+      setTotalPages(res.data.totalPages);
+    }
+  } catch (err) {
+    console.error(err);
+    setUsers([]);
+  }
+};
+
+const fetchNotifications = async () => {
+    try {
+      const res = await api.get(
+        "/notifications/Admin",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setNotifications(res.data);
+    } catch (err) {
+      console.error("Error fetching notifications:", err.response?.data);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
 
   useEffect(() => {
     fetchUsers(page);
   }, []);
-  
 
 
    const columns = [
@@ -162,6 +201,7 @@ export default function UserManagement() {
               <UserPlus className="w-4 h-4 mr-2" /> Add User
           </Button>
         }
+         notifications={notifications}  
       />
     {ShowRegisterForm && (
         <Register
@@ -202,6 +242,19 @@ export default function UserManagement() {
               }}
             />
         </div>
+         <Select   defaultValue='all' value={status} onValueChange={handleDepartmentFilter}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Department" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Users</SelectItem>
+              <SelectItem value="maintenance">Maintenance</SelectItem>
+              <SelectItem value="logistics">Logistics</SelectItem>
+              <SelectItem value="safety">Safety</SelectItem>
+              <SelectItem value="hr">HR</SelectItem>
+              <SelectItem value="operation">Operation</SelectItem>
+            </SelectContent>
+          </Select>
       </div>
 
       {/* Users Table (Here Data is rendered) */}  

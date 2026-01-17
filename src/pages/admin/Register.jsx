@@ -66,44 +66,47 @@ const Register = ({ onClose,user }) => {
 
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      if (user?._id) {
-        // EDIT USER
-        await api.put(`/auth/edit/${user._id}`, formData, { withCredentials: true });
-        toast("User updated successfully");
-        onClose();
-        return;
-      }
-      // CREATE USER
-      const res = await api.post("/auth/register", formData, {
-        withCredentials: true,
-      });
-      if (res.data.success) {
-        toast.success("User registered successfully");
-        onClose();
-        // SEND EMAIL
-        api.post( "/auth/send-user-email", {
-            name: formData.name,
-            email: formData.email,
-            role: formData.role,
-            department: formData.department,
-            password: formData.password,
-          },
-          { withCredentials: true }
-        ).catch((err) => {
-          console.error("Email failed:", err);
-          toast("User created but email not sent");
-        });
-        toast("Credentails Email Send successfully");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Operation failed");
-    } finally {
-      setLoading(false);
+  e.preventDefault();
+  setLoading(true);
+  try {
+    if (user?._id) {
+      // EDIT USER
+      await api.put(`/auth/edit/${user._id}`, formData, { withCredentials: true });
+      toast.success("User updated successfully");
+      onClose();
+      return;
     }
+    // CREATE USER
+    const res = await api.post("/auth/register", formData, {
+      withCredentials: true,
+    });
+    if (res.status === 201) {
+      toast.success("User registered successfully");
+      onClose();
+
+      api.post("/auth/send-user-email", {
+        name: formData.name,
+        email: formData.email,
+        role: formData.role,
+        department: formData.department,
+        password: formData.password,
+      }, { withCredentials: true })
+      .then(() => {
+        toast.success("Credentials email sent successfully");
+      })
+      .catch((err) => {
+        console.error("Email failed:", err);
+        toast.error("User created but email not sent");
+      });
+    } else {
+      toast.error(res.data.message || "Registration failed");
+    }
+  } catch (err) {
+    console.error(err);
+    toast.error("Operation failed");
+  } finally {
+    setLoading(false);
+  }
 };
 
 

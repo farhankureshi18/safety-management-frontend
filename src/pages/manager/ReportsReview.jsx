@@ -23,6 +23,7 @@ export default function ReportsReview() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedReport, setSelectedReport] = useState(null);
   const [openView, setOpenView] = useState(false);
+  const [notifications, setNotifications] = useState([]);
 
 
   /*Pagination constant value */
@@ -115,9 +116,26 @@ export default function ReportsReview() {
   }
 };
 
+ const fetchNotifications = async () => {
+    try {
+      const res = await api.get(
+        "/notifications/Manager",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setNotifications(res.data);
+    } catch (err) {
+      console.error("Error fetching notifications:", err.response?.data);
+    }
+  };
+
 
   useEffect(()=>{
     fetchAllReports();
+    fetchNotifications();
   },[])
 
   useEffect(() => {
@@ -131,6 +149,7 @@ export default function ReportsReview() {
       <PageHeader
         title="Reports Review"
         subtitle="Review and process submitted safety reports"
+        notifications={notifications}
       />
 
       {/* Filters */}
@@ -181,45 +200,108 @@ export default function ReportsReview() {
         </div>
 
 
-      {/*View Box*/}
-      {openView && selectedReport && (
-            <Dialog open={openView} onOpenChange={setOpenView}>
-              <DialogContent className="max-w-xl">
-                <DialogHeader>
-                  <DialogTitle>{selectedReport.reportTitle}</DialogTitle>
-                </DialogHeader>
+         {openView && selectedReport && (
+  <Dialog open={openView} onOpenChange={setOpenView}>
+    <DialogContent className="max-w-3xl p-0 overflow-hidden">
 
-              {/* IMAGE */}
-             {selectedReport?.attachment?.url ? (
-              <img
-                src={selectedReport.attachment.url}
-                alt="report"
-                className="w-full h-48 object-contain rounded"
-              />
-            ) : (
-              <p className="text-sm text-muted-foreground">No attachment</p>
-            )}
+      {/* ===== Header ===== */}
+      <div className="px-6 py-4 border-b">
+        <h2 className="text-xl font-semibold tracking-tight">
+          {selectedReport.reportTitle}
+        </h2>
+        <p className="text-sm text-muted-foreground mt-1">
+          Report ID • {selectedReport._id.slice(-6)}
+        </p>
+      </div>
 
+      {/* ===== Image Section ===== */}
+      {selectedReport?.attachment?.url ? (
+        <div className="bg-muted">
+          <img
+            src={selectedReport.attachment.url}
+            alt="Report Attachment"
+            className="w-full max-h-[280px] object-contain mx-auto"
+          />
+        </div>
+      ) : (
+        <div className="h-40 flex items-center justify-center text-sm text-muted-foreground">
+          No attachment available
+        </div>
+      )}
 
-              {/* DETAILS */}
-              <div className="space-y-2 text-sm">
-                <p><b>Category:</b> {selectedReport.category}</p>
-                <p><b>Priority:</b> {selectedReport.priority}</p>
-                <p><b>Status:</b> {selectedReport.status}</p>
-                <p><b>Location:</b> {selectedReport.location}</p>
-                <p><b>Description:</b> {selectedReport.description}</p>
+      {/* ===== Body ===== */}
+      <div className="p-6 space-y-6">
 
-                <hr />
+        {/* Status Row */}
+        <div className="flex flex-wrap gap-2">
+          <span className="px-3 py-1 rounded-full text-xs font-medium bg-secondary">
+            {selectedReport.category}
+          </span>
 
-                <p><b>Reported By:</b> {selectedReport.reportedBy?.name}</p>
-                <p><b>Department:</b> {selectedReport.reportedBy?.department}</p>
-                <p>
-                  <b>Date:</b>{" "}
-                  {new Date(selectedReport.createdAt).toLocaleString()}
-                </p>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <span
+            className={`px-3 py-1 rounded-full text-xs font-medium
+              ${selectedReport.priority === "Critical"
+                ? "bg-red-100 text-red-700"
+                : selectedReport.priority === "High"
+                ? "bg-orange-100 text-orange-700"
+                : selectedReport.priority === "Medium"
+                ? "bg-yellow-100 text-yellow-700"
+                : "bg-muted text-muted-foreground"
+              }`}
+          >
+            {selectedReport.priority} Priority
+          </span>
+
+          <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+            {selectedReport.status}
+          </span>
+        </div>
+
+        {/* Description */}
+        <div>
+          <h4 className="text-sm font-semibold text-foreground mb-1">
+            Description
+          </h4>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {selectedReport.description || "No description provided"}
+          </p>
+        </div>
+
+        {/* Info Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+
+          <div className="bg-muted/50 rounded-lg p-4">
+            <p className="text-xs text-muted-foreground">Location</p>
+            <p className="font-medium mt-1">
+              {selectedReport.location || "N/A"}
+            </p>
+          </div>
+
+          <div className="bg-muted/50 rounded-lg p-4">
+            <p className="text-xs text-muted-foreground">Reported Date</p>
+            <p className="font-medium mt-1">
+              {new Date(selectedReport.createdAt).toLocaleString()}
+            </p>
+          </div>
+
+          <div className="bg-muted/50 rounded-lg p-4">
+            <p className="text-xs text-muted-foreground">Reported By</p>
+            <p className="font-medium mt-1">
+              {selectedReport.reportedBy?.name || "N/A"}
+            </p>
+          </div>
+
+          <div className="bg-muted/50 rounded-lg p-4">
+            <p className="text-xs text-muted-foreground">Department</p>
+            <p className="font-medium mt-1">
+              {selectedReport.reportedBy?.department || "N/A"}
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </DialogContent>
+  </Dialog>
       )}
 
 
